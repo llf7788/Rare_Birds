@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>register</title>
+    <script src="../static/js/register.js" rel="script" type="text/javascript"></script>
+</head>
+
+<body>
+<div style="text-align: center">
+    <div>
+        <h1>Register</h1>
+    </div>
+
+    <div>
+        <form id="form_register" action="./register" method="post">
+            <div>
+                <label for="input_username">username:</label>
+                <input id="input_username" type="text" name="username" placeholder="username">
+            </div>
+            <br>
+
+            <div>
+                <label for="input_password">passport:</label>
+                <input id="input_password" type="password" name="password" placeholder="password">
+            </div>
+            <br>
+
+            <p id="hidden" style="display: none" th:text="${error}"></p>
+        </form>
+    </div>
+
+    <div>
+        <input id="button_register" type="button" value="Sign up now">
+    </div>
+
+</div>
+</body>
+
+</html>

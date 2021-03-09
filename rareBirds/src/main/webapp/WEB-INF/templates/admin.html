@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ADMIN</title>
+    <link href="../static/css/admin.css" rel="stylesheet" type="text/css">
+    <script src="../static/js/admin.js" rel="script" type="text/javascript"></script>
+</head>
+
+<body>
+<div style="text-align: center">
+    <div style="background-color: yellowgreen; text-align: right">
+        <div style="margin-right: 100px"
+             th:with="user_has_login = ${session} != null and ${session.session_attr_user} != null">
+            <div th:if="${user_has_login}">
+                <div>
+                    <span th:text="'Welcome, ' + ${session.session_attr_user.role} + '! ' + ${session.session_attr_user.name}"></span>
+                </div>
+                <div>
+                    <a href="/user/logout">
+                        <h3 id="logout">Logout</h3>
+                    </a>
+                </div>
+            </div>
+            <div th:unless="${user_has_login}">
+                <div>
+                    <span>Welcome!</span>
+                </div>
+                <div>
+                    <a href="/user/login">
+                        <h3 id="login">Login</h3>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h1>User Role Control</h1>
+    </div>
+    <div>
+        <table id="table_user_role">
+            <thead>
+            <tr>
+                <td>userId</td>
+                <td>username</td>
+                <td>role</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td class="user_id" th:text="${user.id}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:if="${user.role} == 'Admin'" th:text="${user.role}"></td>
+                <td th:if="${user.role} != 'Admin'">
+                    <select class="user_role" name="role" aria-label="role" th:onchange="'onRoleChange(this)'">
+                        <option value="User" th:selected="${user.role} == 'User'" th:text="'User'"></option>
+                        <option value="Manager" th:selected="${user.role} == 'Manager'" th:text="'Manager'"></option>
+                    </select>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

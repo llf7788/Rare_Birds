@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rare Bird</title>
+    <link rel="stylesheet" href="../static/css/index.css" type="text/css">
+</head>
+
+<body>
+<div style="text-align: center">
+    <div style="background-color: yellowgreen; text-align: right">
+        <div style="margin-right: 100px" th:with="user_has_login = ${session} != null and ${session.session_attr_user} != null">
+            <div th:if="${user_has_login}">
+                <div>
+                    <span th:text="'Welcome, ' + ${session.session_attr_user.role} + '! ' + ${session.session_attr_user.name}"></span>
+                </div>
+                <div>
+                    <a href="/user/logout">
+                        <h3 id="logout">Logout</h3>
+                    </a>
+                </div>
+            </div>
+            <div th:unless="${user_has_login}">
+                <div>
+                    <span>Welcome!</span>
+                </div>
+                <div>
+                    <a  href="/user/login">
+                        <h3 id="login">Login</h3>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>name</th>
+                <th>image</th>
+                <th>description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="bird : ${birdInfos}">
+                <td><a th:href="@{/bird/detail(id = ${bird.id})}" th:text="${bird.name}" target="_blank"></a></td>
+                <td><img width="200px" height="200px" th:src="@{${bird.images[0].url}}" alt="image"></td>
+                <td th:text="${bird.description}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+<div >
+                <a href="/admin">
+            <h3>Admin management</h3>
+                </a>
+            </div>
+            
+</div>
+
+</body>
+</html>

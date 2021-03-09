@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>bird</title>
+    <script src="../static/js/jquery-3.3.1.min.js" rel="script" type="text/javascript"></script>
+    <script type="text/javascript">
+        async function deleteComment(event) {
+            let divComment = event.parentElement.parentElement;
+            let commentId = divComment.querySelector(".comment-id").innerText;
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/comment/delete",
+                data: {"id": commentId},
+                success: function (res) {
+                    if (res.success) {
+                        hideComment(event);
+                    } else {
+                        alert(res.message)
+                    }
+                }
+            })
+        }
+
+        async function hideComment(event) {
+            event.parentElement.parentElement.style.display = "none";
+        }
+    </script>
+</head>
+
+<body>
+<div>
+    <div style="background-color: yellowgreen; text-align: right">
+        <div style="margin-right: 100px"
+             th:with="user_has_login = ${session} != null and ${session.session_attr_user} != null">
+            <div th:if="${user_has_login}">
+                <div>
+                    <span th:text="'Welcome, ' + ${session.session_attr_user.role} + '! ' + ${session.session_attr_user.name}"></span>
+                </div>
+                <div id="div-user-name" style="display: none" th:text="${session.session_attr_user.name}"></div>
+                <div>
+                    <a href="/user/logout">
+                        <h3 id="logout">Logout</h3>
+                    </a>
+                </div>
+            </div>
+            <div th:unless="${user_has_login}">
+                <div>
+                    <span>Welcome!</span>
+                </div>
+                <div>
+                    <a href="/user/login">
+                        <h3 id="login">Login</h3>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center">
+        <div id="div-bird-id" th:text="${birdInfo.id}" style="display: none"></div>
+        <div th:text="${birdInfo.name}"></div>
+        <div th:text="${birdInfo.description}"></div>
+        <div th:each="image : ${birdInfo.images}">
+            <img width="400px" height="400px" th:src="@{${image.url}}" alt="image">
+        </div>
+    </div>
+
+    <hr>
+    <div id="comment-area" th:if="${comments} != null" th:each="comment : ${comments}">
+        <div style="margin-bottom: 20px">
+            <div class="comment-id" th:text="${comment.id}" style="display: none"></div>
+            <div th:text="${comment.username} + ' comment:'"></div>
+            <div th:text="${comment.comment}"></div>
+            <div th:if="${session.session_attr_user.role} == 'Manager' or ${session.session_attr_user.role} == 'Admin'">
+                <input type="button" value="Delete" th:onclick="|deleteComment(this)|">
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${session} != null" style="text-align: center">
+        <iframe id="hideIframe" name="hideIframe" style="display:none;"></iframe>
+        <form action="./ajax/v2/comments" method="post" id="user_comment_form" target="hideIframe">
+            <label for="comment_content"></label>
+            <textarea id="comment_content" name="content" placeholder="add your comments"
+                      cols="black"></textarea>
+        </form>
+        <input id="button_comment" type="button" value="Submit">
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    window.addEventListener("load", function () {
+        let commentButton = document.getElementById("button_comment");
+        if (typeof(commentButton) != "undefined") {
+            commentButton.addEventListener("click", submitComment);
+        }
+
+        async function submitComment(event) {
+            let data = new URLSearchParams();
+            data.append("birdId", document.getElementById("div-bird-id").innerText);
+
+            let comment = document.getElementById("comment_content").value;
+            if (comment.length <= 0) {
+                alert("please add some comment")
+            }
+            data.append("comment", comment);
+
+            await fetch("/comment/publish", {
+                method: "POST",
+                body: data
+            }).then(response => response.json())
+                .then(res => {
+                    if (res.success) {
+                        displayLastComment(event);
+                    } else {
+                        alert(res.message)
+                    }
+                })
+        }
+
+        async function displayLastComment(event) {
+            let comment = document.getElementById("comment_content");
+            let commentValue = comment.value;
+            comment.value = "";
+
+            let area = document.getElementById("comment-area");
+            let div = document.createElement("div");
+            div.style.marginBottom = "20px";
+
+            let divUser = document.createElement("div");
+            let userName = document.getElementById("div-user-name").innerText;
+            divUser.innerText = userName + " comment:";
+            div.appendChild(divUser);
+
+            let divComment = document.createElement("div");
+            divComment.innerText = commentValue;
+            div.appendChild(divComment);
+
+            area.appendChild(div);
+        }
+    })
+</script>
+</body>
+</html>
